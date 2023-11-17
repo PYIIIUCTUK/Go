@@ -216,31 +216,36 @@ namespace Go
             bool res = false;
             int x = X;
             int y = Y + 1;
-            int num = checkedCells.Count;
 
-            if (CheckDead(x, y, num)) { res = true; }
-            num = checkedCells.Count;
+            if (CheckDead(x, y)) { res = true; }
+            UnchectedCells();
+            map[mouseY][mouseX].Checked = true;
+            checkedCells.Add(map[mouseY][mouseX]);
 
             x = X;
             y = Y - 1;
-            if (CheckDead(x, y, num)) { res = true; }
-            num = checkedCells.Count;
+            if (CheckDead(x, y)) { res = true; }
+            UnchectedCells();
+            map[mouseY][mouseX].Checked = true;
+            checkedCells.Add(map[mouseY][mouseX]);
 
             x = X - 1;
             y = Y;
-            if (CheckDead(x, y, num)) { res = true; }
-            num = checkedCells.Count;
+            if (CheckDead(x, y)) { res = true; }
+            UnchectedCells();
+            map[mouseY][mouseX].Checked = true;
+            checkedCells.Add(map[mouseY][mouseX]);
 
             x = X + 1;
             y = Y;
-            if (CheckDead(x, y, num)) { res = true; }
+            if (CheckDead(x, y)) { res = true; }
+            UnchectedCells();
 
             curPlayer.Score -= deadCells.Count;
             ChangePlayer();
-            UnchectedCells();
             return res;
         }
-        private bool CheckDead(int x, int y, int num)
+        private bool CheckDead(int x, int y)
         {
             if (x >= 0 && x < W && y >= 0 && y < H)
             {
@@ -248,16 +253,16 @@ namespace Go
                 {
                     if (!CheckAllNearest(x, y))
                     {
-                        AddToDead(num);
+                        AddToDead();
                         return true;
                     }
                 }
             }
             return false;
         }
-        private void AddToDead(int ind)
+        private void AddToDead()
         {
-            for (int i = ind; i < checkedCells.Count; i++)
+            for (int i = 1; i < checkedCells.Count; i++)
             {
                 deadCells.Add(checkedCells[i]);
             }
@@ -284,20 +289,24 @@ namespace Go
         {
             if (!CheckCanMove())
             {
-                if (players[0].Score > players[1].Score)
+                ChangePlayer();
+                if (!CheckCanMove())
                 {
-                    MessageBox.Show("White Win");
-                    return true;
-                }
-                else if (players[0].Score < players[1].Score)
-                {
-                    MessageBox.Show("Black Win");
-                    return true;
-                }
-                else
-                {
-                    MessageBox.Show("Draw");
-                    return true;
+                    if (players[0].Score > players[1].Score)
+                    {
+                        MessageBox.Show("White Win");
+                        return true;
+                    }
+                    else if (players[0].Score < players[1].Score)
+                    {
+                        MessageBox.Show("Black Win");
+                        return true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Draw");
+                        return true;
+                    }
                 }
             }
             return false;
